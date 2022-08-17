@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/new/Icons">
+        <file>Icons/3643729_trash_delete_waste_rubbish_garbage_bin.png</file>
+        <file>Icons/3643750_stationary_edit_pencil_draw_write.png</file>
+        <file>Icons/3643753_paper_blank_file_document_doc.png</file>
+        <file>Icons/COMPASS.svg</file>
+        <file>Icons/EMPTY BLANK.svg</file>
+        <file>Icons/NAVIGATION.svg</file>
+        <file>Icons/PLUS.svg</file>
+        <file>Icons/TRASH BIN.svg</file>
+        <file>Icons/3017947_plus_outline_extra_sum_more_total_add.png</file>
+        <file>Icons/4168573_close_minus_trash_cancel_remove_outline_delete.png</file>
+    </qresource>
+</RCC>
