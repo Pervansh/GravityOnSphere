@@ -4,7 +4,7 @@
 #include <QTimer>
 #include "SphereGravityModel.h"
 #include "SphereOrthogonalProjectionScene.h"
-#include "SphereOrthogonalProjectionArcDrawer.h"
+#include "SphereOrthogonalProjectionArcManager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,7 +18,7 @@ private:
     SphereOrthogonalProjectionScene* scene;
     SphereGravityModel* gravityModel;
 
-    SphereOrthogonalProjectionArcDrawer* arcDrawer;
+    SphereOrthogonalProjectionArcManager* arcManager;
 
     QTimer* modelStepTimer;
 

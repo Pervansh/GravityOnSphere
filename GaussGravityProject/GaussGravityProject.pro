@@ -13,7 +13,7 @@ SOURCES += \
     RotationTriple.cpp \
     SphereGravityModel.cpp \
     SphereMaterialPoint.cpp \
-    SphereOrthogonalProjectionArcDrawer.cpp \
+    SphereOrthogonalProjectionArcManager.cpp \
     SphereOrthogonalProjectionScene.cpp \
     Vector2d.cpp \
     main.cpp \
@@ -25,7 +25,7 @@ HEADERS += \
     RotationTriple.h \
     SphereGravityModel.h \
     SphereMaterialPoint.h \
-    SphereOrthogonalProjectionArcDrawer.h \
+    SphereOrthogonalProjectionArcManager.h \
     SphereOrthogonalProjectionScene.h \
     Vector3d.h \
     Vector2d.h \

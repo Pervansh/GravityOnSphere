@@ -39,15 +39,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     scene->addMaterialPoint(gravityModel->addPoint({0.7, 0, 0.7}, 1));
     */
 
-    arcDrawer = new SphereOrthogonalProjectionArcDrawer(scene);
+    arcManager = new SphereOrthogonalProjectionArcManager(scene);
 
     connect(modelStepTimer, &QTimer::timeout,
-            arcDrawer, &SphereOrthogonalProjectionArcDrawer::updateProjections);
+            arcManager, &SphereOrthogonalProjectionArcManager::updateProjections);
     connect(scene, &SphereOrthogonalProjectionScene::perspectiveChange,
-            arcDrawer, &SphereOrthogonalProjectionArcDrawer::updateProjections);
+            arcManager, &SphereOrthogonalProjectionArcManager::updateProjections);
 
-    arcDrawer->addEllipse({0, 1, 0}, {0, 0, 1}, QPen(Qt::yellow));
-    arcDrawer->addArc({0, 1, 0}, {0, 0, 1}, QPen(Qt::red));
+    arcManager->addClosedArc({0, 1, 0}, {0, 0, 1}, QPen(Qt::yellow, 2, Qt::PenStyle::SolidLine));
+    arcManager->addArc({0, 1, 0}, {0, 0, 1}, QPen(Qt::red, 3));
 
     onSpeedSliderValueChange();
 
