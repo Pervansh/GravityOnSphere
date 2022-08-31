@@ -16,7 +16,6 @@ private:
     ConcentrationType concentration;
 
 public:
-
     static const ConcentrationType STANDART_C_FUNC;
 
     SphereGravityModel(const ConcentrationType&);
@@ -29,4 +28,6 @@ public:
     void     deletePoint(Iterator iterator);
 
     const std::list<SphereMaterialPoint>& getPointList() const;
+
+    virtual ~SphereGravityModel();
 };

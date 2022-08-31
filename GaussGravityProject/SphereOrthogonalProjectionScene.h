@@ -11,8 +11,9 @@
 #include "SphereMaterialPoint.h"
 
 class SphereOrthogonalProjectionScene : public QGraphicsScene {
-private:
     Q_OBJECT
+
+private:
     struct PointContainer {
         QGraphicsEllipseItem* ellipseItem;
         SphereGravityModel::Iterator pointIterator;
@@ -25,6 +26,10 @@ private:
     SphereGravityModel* gravityModel;
 
     RotationTriple<double> perspectiveTriple;
+
+    double projectionCircleRadius;
+
+    QGraphicsEllipseItem* projectionCircle;
 
     QGraphicsLineItem* oxLineItem;
     QGraphicsLineItem* oyLineItem;
@@ -45,16 +50,29 @@ public:
     /// Rotates the perspectiveTriple around the OY axis
     void rotatePerspectiveOY(double angle);
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 
     ~SphereOrthogonalProjectionScene();
 
     const RotationTriple<double>& getPerspectiveTriple() const;
+    const Vector3d<double>& i() const;
+    const Vector3d<double>& j() const;
+    const Vector3d<double>& k() const;
+
+    double getProjectionCircleRadius() const;
+    void setProjectionCircleRadius(double newProjectionCircleRadius);
+
+    SphereGravityModel *getGravityModel() const;
+
+    QGraphicsEllipseItem *getProjectionCircle() const;
 
 signals:
-    void perspectiveChange();
+    void perspectiveChanged();
+    void projectionCircleRadiusChanged();
 
 public slots:
-    void updatePointDisplays();
+    void updatePointDisplay(PointContainer* pointContainer);
+    void updateAllPointDisplays();
+    void updateAxisLines();
 
 };

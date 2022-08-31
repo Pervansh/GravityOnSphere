@@ -9,23 +9,35 @@ CONFIG += c++17 # c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    AddPointEditingState.cpp \
+    ModelEditingGraphicsView.cpp \
+    ModelEditingState.cpp \
+    ModelTimeManager.cpp \
+    NoEditingState.cpp \
     NormalizedVector3d.cpp \
     RotationTriple.cpp \
+    SimulationPlayButton.cpp \
     SphereGravityModel.cpp \
     SphereMaterialPoint.cpp \
-    SphereOrthogonalProjectionArcDrawer.cpp \
+    SphereOrthogonalProjectionArcManager.cpp \
     SphereOrthogonalProjectionScene.cpp \
     Vector2d.cpp \
     main.cpp \
     MainWindow.cpp
 
 HEADERS += \
+    AddPointEditingState.h \
     MainWindow.h \
+    ModelEditingGraphicsView.h \
+    ModelEditingState.h \
+    ModelTimeManager.h \
+    NoEditingState.h \
     NormalizedVector3d.h \
     RotationTriple.h \
+    SimulationPlayButton.h \
     SphereGravityModel.h \
     SphereMaterialPoint.h \
-    SphereOrthogonalProjectionArcDrawer.h \
+    SphereOrthogonalProjectionArcManager.h \
     SphereOrthogonalProjectionScene.h \
     Vector3d.h \
     Vector2d.h \
@@ -37,6 +49,7 @@ FORMS += \
 
 TRANSLATIONS += \
     GaussGravityProject_ru_RU.ts
+
 CONFIG += lrelease
 CONFIG += embed_translations
 

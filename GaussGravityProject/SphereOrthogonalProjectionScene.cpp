@@ -8,6 +8,39 @@ const RotationTriple<double>& SphereOrthogonalProjectionScene::getPerspectiveTri
     return perspectiveTriple;
 }
 
+const Vector3d<double> &SphereOrthogonalProjectionScene::i() const {
+    return perspectiveTriple.getPointer();
+}
+
+const Vector3d<double> &SphereOrthogonalProjectionScene::j() const {
+    return perspectiveTriple.getTangent();
+}
+
+const Vector3d<double> &SphereOrthogonalProjectionScene::k() const {
+    return perspectiveTriple.getGuide();
+}
+
+double SphereOrthogonalProjectionScene::getProjectionCircleRadius() const {
+    return projectionCircleRadius;
+}
+
+void SphereOrthogonalProjectionScene::setProjectionCircleRadius(double newProjectionCircleRadius) {
+    projectionCircleRadius = newProjectionCircleRadius;
+    projectionCircle->setRect(-projectionCircleRadius, -projectionCircleRadius,
+                              2 * projectionCircleRadius, 2 * projectionCircleRadius);
+    updateAllPointDisplays();
+
+    emit projectionCircleRadiusChanged();
+}
+
+SphereGravityModel *SphereOrthogonalProjectionScene::getGravityModel() const {
+    return gravityModel;
+}
+
+QGraphicsEllipseItem *SphereOrthogonalProjectionScene::getProjectionCircle() const {
+    return projectionCircle;
+}
+
 SphereOrthogonalProjectionScene::SphereOrthogonalProjectionScene(SphereGravityModel* _gravityModel,
                                                                  QObject* parent)
     : QGraphicsScene(parent),
@@ -17,18 +50,13 @@ SphereOrthogonalProjectionScene::SphereOrthogonalProjectionScene(SphereGravityMo
     backgroundBrush = QBrush(Qt::black);
     setBackgroundBrush(backgroundBrush);
 
-    addEllipse(0, 0, 300, 300, QPen(Qt::white));
+    projectionCircle = addEllipse(0, 0, 0, 0, QPen(Qt::white));
+    setProjectionCircleRadius(200);
 
-    auto [x1, y1] = projectOnXOY({1, 0, 0});
-    oxLineItem = addLine(150, 150, 150 + x1 * 150, 150 - y1 * 150, QPen(Qt::red));
-
-    auto [x2, y2] = projectOnXOY({0, 1, 0});
-    oyLineItem = addLine(150, 150, 150 + x2 * 150, 150 - y2 * 150, QPen(Qt::green));
-
-    auto [x3, y3] = projectOnXOY({0, 0, 1});
-    ozLineItem = addLine(150, 150, 150 + x3 * 150, 150 - y3 * 150, QPen(Qt::blue));
-
-    perspectiveTriple.debug();
+    oxLineItem = addLine(0, 0, 0, 0);
+    oyLineItem = addLine(0, 0, 0, 0);
+    ozLineItem = addLine(0, 0, 0, 0);
+    updateAxisLines();
 }
 
 void SphereOrthogonalProjectionScene::addMaterialPoint(SphereGravityModel::Iterator pointIterator) {
@@ -36,6 +64,7 @@ void SphereOrthogonalProjectionScene::addMaterialPoint(SphereGravityModel::Itera
     auto [x, y] = projectOnXOY(pos);
     auto ellipseItem = addEllipse(x, y, 5, 5, QPen(Qt::yellow), QBrush(Qt::yellow));
     pointContainerList.push_back({ellipseItem, pointIterator});
+    updatePointDisplay(&pointContainerList.back());
 }
 
 std::pair<double, double> SphereOrthogonalProjectionScene::projectOnXOY(Vector3d<double> vector) {
@@ -77,7 +106,7 @@ void SphereOrthogonalProjectionScene::rotatePerspectiveOY(double angle) {
 }
 
 void SphereOrthogonalProjectionScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-    qInfo() << "mouseMoveEvent";
+    QGraphicsScene::mouseMoveEvent(event);
 
     Qt::MouseButtons buttons = event->buttons();
 
@@ -97,33 +126,11 @@ void SphereOrthogonalProjectionScene::mouseMoveEvent(QGraphicsSceneMouseEvent* e
         perspectiveTriple.debug();
         qDebug() << curX << " " << curY;
 
-        auto [x1, y1] = projectOnXOY({1, 0, 0});
-        oxLineItem->setLine(150, 150, 150 + x1 * 150, 150 - y1 * 150);
-        if (projectOnOZ({1, 0, 0}) >= 0) {
-            oxLineItem->setPen(QPen(Qt::red, 2));
-        } else {
-            oxLineItem->setPen(QPen(Qt::red, 1, Qt::PenStyle::DotLine));
-        }
+        updateAxisLines();
 
-        auto [x2, y2] = projectOnXOY({0, 1, 0});
-        oyLineItem->setLine(150, 150, 150 + x2 * 150, 150 - y2 * 150);
-        if (projectOnOZ({0, 1, 0}) >= 0) {
-            oyLineItem->setPen(QPen(Qt::green, 2));
-        } else {
-            oyLineItem->setPen(QPen(Qt::green, 1, Qt::PenStyle::DotLine));
-        }
+        emit perspectiveChanged();
 
-        auto [x3, y3] = projectOnXOY({0, 0, 1});
-        ozLineItem->setLine(150, 150, 150 + x3 * 150, 150 - y3 * 150);
-        if (projectOnOZ({0, 0, 1}) >= 0) {
-            ozLineItem->setPen(QPen(Qt::blue, 2));
-        } else {
-            ozLineItem->setPen(QPen(Qt::blue, 1, Qt::PenStyle::DotLine));
-        }
-
-        emit perspectiveChange();
-
-        updatePointDisplays();
+        updateAllPointDisplays();
 
         setBackgroundBrush(backgroundBrush);
     }
@@ -131,19 +138,61 @@ void SphereOrthogonalProjectionScene::mouseMoveEvent(QGraphicsSceneMouseEvent* e
 
 SphereOrthogonalProjectionScene::~SphereOrthogonalProjectionScene() {}
 
-void SphereOrthogonalProjectionScene::updatePointDisplays() {
+void SphereOrthogonalProjectionScene::updatePointDisplay(PointContainer* pointContainer) {
+    auto [x, y] = projectOnXOY(pointContainer->pointIterator->getPosition());
+    auto z = projectOnOZ(pointContainer->pointIterator->getPosition());
+
+    if (z >= 0) {
+        pointContainer->ellipseItem->setBrush(QBrush(Qt::yellow));
+        pointContainer->ellipseItem->setRect(x * projectionCircleRadius, -y * projectionCircleRadius, 4 + 2 * z, 4 + 2 * z);
+    } else {
+        pointContainer->ellipseItem->setBrush(QBrush(Qt::yellow, Qt::BrushStyle::NoBrush));
+        pointContainer->ellipseItem->setRect(x * projectionCircleRadius, -y * projectionCircleRadius, 4 + 2 * z, 4 + 2 * z);
+    }
+}
+
+void SphereOrthogonalProjectionScene::updateAllPointDisplays() {
     for(auto& pointContainer : pointContainerList) {
+        /*
         auto [x, y] = projectOnXOY(pointContainer.pointIterator->getPosition());
         auto z = projectOnOZ(pointContainer.pointIterator->getPosition());
 
         if (z >= 0) {
             pointContainer.ellipseItem->setBrush(QBrush(Qt::yellow));
-            pointContainer.ellipseItem->setRect(150 + x * 150, 150 - y * 150, 4 + 2 * z, 4 + 2 * z);
+            pointContainer.ellipseItem->setRect(x * projectionCircleRadius, -y * projectionCircleRadius, 4 + 2 * z, 4 + 2 * z);
         } else {
             pointContainer.ellipseItem->setBrush(QBrush(Qt::yellow, Qt::BrushStyle::NoBrush));
-            pointContainer.ellipseItem->setRect(150 + x * 150, 150 - y * 150, 4 + 2 * z, 4 + 2 * z);
+            pointContainer.ellipseItem->setRect(x * projectionCircleRadius, -y * projectionCircleRadius, 4 + 2 * z, 4 + 2 * z);
         }
+        */
+        updatePointDisplay(&pointContainer);
     }
 
     setBackgroundBrush(backgroundBrush);
+}
+
+void SphereOrthogonalProjectionScene::updateAxisLines() {
+    auto [x1, y1] = projectOnXOY({1, 0, 0});
+    oxLineItem->setLine(0, 0, x1 * projectionCircleRadius, -y1 * projectionCircleRadius);
+    if (projectOnOZ({1, 0, 0}) >= 0) {
+        oxLineItem->setPen(QPen(Qt::red, 2));
+    } else {
+        oxLineItem->setPen(QPen(Qt::red, 1, Qt::PenStyle::DotLine));
+    }
+
+    auto [x2, y2] = projectOnXOY({0, 1, 0});
+    oyLineItem->setLine(0, 0, x2 * projectionCircleRadius, -y2 * projectionCircleRadius);
+    if (projectOnOZ({0, 1, 0}) >= 0) {
+        oyLineItem->setPen(QPen(Qt::green, 2));
+    } else {
+        oyLineItem->setPen(QPen(Qt::green, 1, Qt::PenStyle::DotLine));
+    }
+
+    auto [x3, y3] = projectOnXOY({0, 0, 1});
+    ozLineItem->setLine(0, 0, x3 * projectionCircleRadius, -y3 * projectionCircleRadius);
+    if (projectOnOZ({0, 0, 1}) >= 0) {
+        ozLineItem->setPen(QPen(Qt::blue, 2));
+    } else {
+        ozLineItem->setPen(QPen(Qt::blue, 1, Qt::PenStyle::DotLine));
+    }
 }
