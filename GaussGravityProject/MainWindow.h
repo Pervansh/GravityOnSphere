@@ -4,7 +4,11 @@
 #include <QTimer>
 #include "SphereGravityModel.h"
 #include "SphereOrthogonalProjectionScene.h"
-#include "SphereOrthogonalProjectionArcDrawer.h"
+#include "SphereOrthogonalProjectionArcManager.h"
+
+#include "ModelTimeManager.h"
+
+#include <QToolButton>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,18 +22,18 @@ private:
     SphereOrthogonalProjectionScene* scene;
     SphereGravityModel* gravityModel;
 
-    SphereOrthogonalProjectionArcDrawer* arcDrawer;
+    SphereOrthogonalProjectionArcManager* arcManager;
 
-    QTimer* modelStepTimer;
+    ModelTimeManager* timeManager;
 
-    double timeCoef;
+protected:
+    virtual void resizeEvent(QResizeEvent *event);
 
 public slots:
-    void doStep();
     void onSpeedSliderValueChange();
+    void updateOrthogonalProjectionCircleRadius();
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void setTimeCoef(double newTimeCoef);
 };

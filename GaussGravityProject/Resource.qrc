@@ -10,5 +10,7 @@
         <file>Icons/TRASH BIN.svg</file>
         <file>Icons/3017947_plus_outline_extra_sum_more_total_add.png</file>
         <file>Icons/4168573_close_minus_trash_cancel_remove_outline_delete.png</file>
+        <file>Icons/PAUSE.svg</file>
+        <file>Icons/PLAY.svg</file>
     </qresource>
 </RCC>

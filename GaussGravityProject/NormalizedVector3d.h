@@ -2,6 +2,10 @@
 
 #include "Vector3d.h"
 
+/**
+* Just an old concept for very complicated normalized vector mechanism.
+* Didn't delete this 'cause it is a memory of my attemp to do something challenging for me)
+*/
 template <typename T>
 struct NormalizedVector3d : public Vector3d<T> {
 public:

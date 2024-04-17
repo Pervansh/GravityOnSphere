@@ -64,3 +64,5 @@ SphereGravityModel::Iterator SphereGravityModel::addPoint(const SphereMaterialPo
 const std::list<SphereMaterialPoint> &SphereGravityModel::getPointList() const {
     return pointList;
 }
+
+SphereGravityModel::~SphereGravityModel() {}
